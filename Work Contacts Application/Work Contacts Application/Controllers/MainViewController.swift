@@ -27,15 +27,14 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         titleLabel.text = "Employees"
         titleLabel.font = UIFont.boldSystemFont(ofSize: 30)
         
-        searchBar.text = ""
-        searchBar.backgroundImage = UIImage()
-        searchBar.delegate = self
+        configureSearchBar()
         
         cancelButton.isHidden = true
         
         employeeTableView.delegate = self
         employeeTableView.dataSource = self
         
+        setupRefresh()
         fetchEmployees()
     }
     
@@ -55,7 +54,16 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         }
         employeeTableView.reloadData()
     }
-
+    
+    func configureSearchBar() {
+        searchBar.delegate = self
+        searchBar.text = ""
+        searchBar.backgroundImage = UIImage()
+        searchBar.searchTextField.clearButtonMode = .never
+    }
+    
+    
+    // Extracting information from JSON, then displaying in collection view
     func fetchEmployees() {
         let urls = [
             URL(string: tallinURL)!,
@@ -64,24 +72,39 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         for url in urls {
             URLSession.shared.dataTask(with: url) { data, response, error in
+                if let error = error {
+                    DispatchQueue.main.async {
+                        self.showError()
+                    }
+                    print("Error: \(error)!")
+                    return
+                }
+                
                 guard let data = data else { return }
+                
+                //Parsing JSON
                 do {
                     let employeeList = try JSONDecoder().decode(EmployeeList.self, from: data)
-                    self.allEmployees.append(contentsOf: employeeList.employees)
                     for employee in employeeList.employees {
-                        self.employeesByPosition[employee.position, default: []].append(employee)
+                        // Check for duplicates
+                        if !self.allEmployees.contains(where: { $0.fname == employee.fname && $0.lname == employee.lname }) {
+                            self.allEmployees.append(employee)
+                            self.employeesByPosition[employee.position, default: []].append(employee)
+                        }
                     }
                     DispatchQueue.main.async {
                         self.employeeTableView.reloadData()
                     }
                 } catch {
                     print(error)
+                    DispatchQueue.main.async {
+                        self.showError()
+                    }
                 }
             }.resume()
         }
     }
 
-    
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return Position.allCases.count
@@ -116,6 +139,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         let cell = tableView.dequeueReusableCell(withIdentifier: "EmployeeCell", for: indexPath) as! EmployeeTableViewCell
         let position = Position.allCases[indexPath.section]
         if let employees = employeesByPosition[position] {
+            // Sorted by last name
             let employee = employees.sorted(by: { $0.lname < $1.lname })[indexPath.row]
             cell.employeeLabel.text = "\(employee.fname) \(employee.lname)"
         }
@@ -137,7 +161,24 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         // Cancel button refreshes the table view
         searchBar(searchBar, textDidChange: "")
     }
-
+    
+    @objc func refreshData() {
+        fetchEmployees()
+        employeeTableView.refreshControl?.endRefreshing()
+    }
+    
+    func setupRefresh() {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        employeeTableView.refreshControl = refreshControl
+    }
+    
+    // Error shown to user
+    func showError() {
+        let alert = UIAlertController(title: "Error fetching data!", message: "Please try again!", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: .default))
+        present(alert, animated: true)
+    }
 
 }
 
