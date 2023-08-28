@@ -42,14 +42,16 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     // Fethcing all the employees to display
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         employeesByPosition = [:]
+        let searchTerms = searchText.split(separator: " ").map { String($0) }
         for employee in allEmployees {
-            if searchText.isEmpty ||
-                employee.fname.lowercased().contains(searchText.lowercased()) ||
-                employee.lname.lowercased().contains(searchText.lowercased()) ||
-                employee.contactDetails.email.lowercased().contains(searchText.lowercased()) ||
-                employee.position.rawValue.lowercased().contains(searchText.lowercased()) ||
-                (employee.projects?.contains(where: { $0.lowercased().contains(searchText.lowercased()) }) ?? false) {
-                    self.employeesByPosition[employee.position, default: []].append(employee)
+            if searchText.isEmpty || searchTerms.allSatisfy({ searchTerm in
+                employee.fname.lowercased().contains(searchTerm.lowercased()) ||
+                employee.lname.lowercased().contains(searchTerm.lowercased()) ||
+                employee.contactDetails.email.lowercased().contains(searchTerm.lowercased()) ||
+                employee.position.rawValue.lowercased().contains(searchTerm.lowercased()) ||
+                (employee.projects?.contains(where: { $0.lowercased().contains(searchTerm.lowercased()) }) ?? false)
+            }) {
+                self.employeesByPosition[employee.position, default: []].append(employee)
             }
         }
         employeeTableView.reloadData()
