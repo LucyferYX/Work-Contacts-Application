@@ -10,7 +10,7 @@ import UIKit
 class EmployeeTableViewCell: UITableViewCell {
 
     @IBOutlet weak var employeeLabel: UILabel!
-    
+
     override func awakeFromNib() {
         super.awakeFromNib()
     }
@@ -18,6 +18,5 @@ class EmployeeTableViewCell: UITableViewCell {
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
     }
-
 
 }

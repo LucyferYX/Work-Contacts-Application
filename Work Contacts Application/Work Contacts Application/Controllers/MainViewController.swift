@@ -38,6 +38,16 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         fetchEmployees()
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "showDetails" {
+            if let detailsViewController = segue.destination as? DetailsViewController,
+               let indexPath = employeeTableView.indexPathForSelectedRow,
+               let employees = employeesByPosition[Position.allCases[indexPath.section]] {
+                detailsViewController.employee = employees.sorted(by: { $0.lname < $1.lname })[indexPath.row]
+            }
+        }
+    }
+
     
     // Fethcing all the employees to display
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
@@ -71,6 +81,10 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
             URL(string: tallinURL)!,
             URL(string: tartuURL)!
         ]
+        
+        // Resetting employees list
+        allEmployees = []
+        employeesByPosition = [:]
         
         for url in urls {
             URLSession.shared.dataTask(with: url) { data, response, error in
@@ -107,45 +121,10 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         }
     }
 
+
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return Position.allCases.count
-    }
-    
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        let position = Position.allCases[section]
-        switch position {
-        case .android:
-            return "Android developers"
-        case .iOS:
-            return "iOS developers"
-        case .other:
-            return "Other positions"
-        case .projectManager:
-            return "Project managers"
-        case .sales:
-            return "Sales managers"
-        case .tester:
-            return "Testers"
-        case .web:
-            return "Web developers"
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let position = Position.allCases[section]
-        return employeesByPosition[position]?.count ?? 0
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "EmployeeCell", for: indexPath) as! EmployeeTableViewCell
-        let position = Position.allCases[indexPath.section]
-        if let employees = employeesByPosition[position] {
-            // Sorted by last name
-            let employee = employees.sorted(by: { $0.lname < $1.lname })[indexPath.row]
-            cell.employeeLabel.text = "\(employee.fname) \(employee.lname)"
-        }
-        return cell
     }
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
@@ -186,6 +165,10 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
 
 
 extension MainViewController {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        performSegue(withIdentifier: "showDetails", sender: self)
+    }
+
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let view = UIView()
         view.backgroundColor = .systemGray6
@@ -204,6 +187,42 @@ extension MainViewController {
         ])
         
         return view
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        let position = Position.allCases[section]
+        switch position {
+        case .android:
+            return "Android developers"
+        case .iOS:
+            return "iOS developers"
+        case .other:
+            return "Other positions"
+        case .projectManager:
+            return "Project managers"
+        case .sales:
+            return "Sales managers"
+        case .tester:
+            return "Testers"
+        case .web:
+            return "Web developers"
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        let position = Position.allCases[section]
+        return employeesByPosition[position]?.count ?? 0
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "EmployeeCell", for: indexPath) as! EmployeeTableViewCell
+        let position = Position.allCases[indexPath.section]
+        if let employees = employeesByPosition[position] {
+            // Sorted by last name
+            let employee = employees.sorted(by: { $0.lname < $1.lname })[indexPath.row]
+            cell.employeeLabel.text = "\(employee.fname) \(employee.lname)"
+        }
+        return cell
     }
 
 }
