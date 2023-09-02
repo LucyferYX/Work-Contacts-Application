@@ -220,7 +220,8 @@ extension MainViewController {
         if let employees = employeesByPosition[position] {
             // Sorted by last name
             let employee = employees.sorted(by: { $0.lname < $1.lname })[indexPath.row]
-            cell.employeeLabel.text = "\(employee.fname) \(employee.lname)"
+            // Prints out last name before first name
+            cell.employeeLabel.text = "\(employee.lname) \(employee.fname)"
         }
         return cell
     }
