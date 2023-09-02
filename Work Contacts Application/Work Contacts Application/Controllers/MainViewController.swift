@@ -40,6 +40,9 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showDetails" {
+            let backItem = UIBarButtonItem()
+            backItem.title = "Employees"
+            navigationItem.backBarButtonItem = backItem
             if let detailsViewController = segue.destination as? DetailsViewController,
                let indexPath = employeeTableView.indexPathForSelectedRow,
                let employees = employeesByPosition[Position.allCases[indexPath.section]] {

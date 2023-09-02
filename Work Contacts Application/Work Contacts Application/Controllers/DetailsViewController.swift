@@ -8,8 +8,6 @@
 import UIKit
 
 class DetailsViewController: UIViewController {
-    
-    @IBOutlet weak var titleLabel: UINavigationItem!
     @IBOutlet weak var nameLabel: UILabel!
     
     @IBOutlet weak var positionTitleLabel: UILabel!
@@ -27,9 +25,12 @@ class DetailsViewController: UIViewController {
     var projects: [String]?
     
     override func viewDidLoad() {
+        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: nil, action: nil)
+        //self.navigationController?.navigationBar.text = "Cancel"
+        self.navigationController?.navigationBar.tintColor = UIColor.systemYellow
+        
         if let employee = employee {
             
-            titleLabel.title = ""
             nameLabel.text = "\(employee.fname) \(employee.lname)"
             
             switch employee.position {
