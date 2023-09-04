@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import Contacts
+import ContactsUI
 
 class MainViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
 
@@ -20,6 +22,9 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     // Dictionary, employees are sorted by position
     var employeesByPosition = [Position: [Employee]]()
     var allEmployees: [Employee] = []
+    //
+    var matchingContact: CNContact?
+    var allContacts: [CNContact] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,6 +41,8 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         setupRefresh()
         fetchEmployees()
+        //
+        fetchAllContacts()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -49,32 +56,6 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
                 detailsViewController.employee = employees.sorted(by: { $0.lname < $1.lname })[indexPath.row]
             }
         }
-    }
-
-    
-    // Fethcing all the employees to display
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        employeesByPosition = [:]
-        let searchTerms = searchText.split(separator: " ").map { String($0) }
-        for employee in allEmployees {
-            if searchText.isEmpty || searchTerms.allSatisfy({ searchTerm in
-                employee.fname.lowercased().contains(searchTerm.lowercased()) ||
-                employee.lname.lowercased().contains(searchTerm.lowercased()) ||
-                employee.contactDetails.email.lowercased().contains(searchTerm.lowercased()) ||
-                employee.position.rawValue.lowercased().contains(searchTerm.lowercased()) ||
-                (employee.projects?.contains(where: { $0.lowercased().contains(searchTerm.lowercased()) }) ?? false)
-            }) {
-                self.employeesByPosition[employee.position, default: []].append(employee)
-            }
-        }
-        employeeTableView.reloadData()
-    }
-    
-    func configureSearchBar() {
-        searchBar.delegate = self
-        searchBar.text = ""
-        searchBar.backgroundImage = UIImage()
-        searchBar.searchTextField.clearButtonMode = .never
     }
     
     
@@ -124,18 +105,6 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         }
     }
 
-
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return Position.allCases.count
-    }
-    
-    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-        UIView.animate(withDuration: 0.3) {
-            self.cancelButton.isHidden = false
-        }
-    }
-
     @IBAction func cancelButtonTapped(_ sender: UIButton) {
         UIView.animate(withDuration: 0.3) {
             self.cancelButton.isHidden = true
@@ -145,29 +114,95 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         // Cancel button refreshes the table view
         searchBar(searchBar, textDidChange: "")
     }
+
+}
+
+
+// Code necessary for handling the native contact requirement!
+
+extension MainViewController {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "EmployeeCell", for: indexPath) as! EmployeeTableViewCell
+        let position = Position.allCases[indexPath.section]
+        if let employees = employeesByPosition[position] {
+            // Sorted by last name
+            let employee = employees.sorted(by: { $0.lname < $1.lname })[indexPath.row]
+            // Prints out last name before first name
+            cell.employeeLabel.text = "\(employee.lname) \(employee.fname)"
+            
+            // Check for matching contact for the employee
+            if let matchingContact = allContacts.first(where: { contact in
+                contact.givenName.caseInsensitiveCompare(employee.fname) == .orderedSame &&
+                    contact.familyName.caseInsensitiveCompare(employee.lname) == .orderedSame
+            }) {
+                // Show the contact button and set its action if a matching contact is found
+                cell.contactButton.isHidden = false
+                cell.contactButtonTapped = { [weak self] in
+                    guard let self = self else { return }
+                    let contactViewController = CNContactViewController(for: matchingContact)
+                    contactViewController.allowsEditing = false
+                    self.navigationController?.pushViewController(contactViewController, animated: true)
+                }
+            } else {
+                // Hide the contact button if no match is found
+                cell.contactButton.isHidden = true
+            }
+        }
+        
+        return cell
+    }
+
     
-    @objc func refreshData() {
-        fetchEmployees()
-        employeeTableView.refreshControl?.endRefreshing()
+    func checkForMatchingContact(for employee: Employee, completion: @escaping (CNContact?) -> Void) {
+        // Check if the user has authorized access to Contacts
+        let authorizationStatus = CNContactStore.authorizationStatus(for: .contacts)
+        guard authorizationStatus == .authorized else {
+            // If access is not authorized
+            completion(nil)
+            return
+        }
+        let contactStore = CNContactStore()
+        let predicate = CNContact.predicateForContacts(matchingName: "\(employee.fname) \(employee.lname)")
+        let keysToFetch: [CNKeyDescriptor] = [CNContactGivenNameKey as CNKeyDescriptor,
+                                              CNContactFamilyNameKey as CNKeyDescriptor,
+                                              CNContactViewController.descriptorForRequiredKeys()]
+        do {
+            // Fetch the matching contacts
+            let matchingContacts = try contactStore.unifiedContacts(matching: predicate, keysToFetch: keysToFetch)
+            completion(matchingContacts.first)
+        } catch {
+            print("Error fetching contacts: \(error)")
+            completion(nil)
+        }
     }
     
-    func setupRefresh() {
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
-        employeeTableView.refreshControl = refreshControl
-    }
-    
-    // Error shown to user
-    func showError() {
-        let alert = UIAlertController(title: "Error fetching data!", message: "Please try again!", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Ok", style: .default))
-        present(alert, animated: true)
+    func fetchAllContacts() {
+        // Check if the user has authorized access to the Contacts
+        let authorizationStatus = CNContactStore.authorizationStatus(for: .contacts)
+        guard authorizationStatus == .authorized else {
+            return
+        }
+        let contactStore = CNContactStore()
+        let request = CNContactFetchRequest(keysToFetch: [CNContactGivenNameKey as CNKeyDescriptor,
+                                                           CNContactFamilyNameKey as CNKeyDescriptor])
+        do {
+            try contactStore.enumerateContacts(with: request) { contact, stop in
+                self.allContacts.append(contact)
+            }
+        } catch {
+            print("Error fetching contacts: \(error)")
+        }
     }
 
 }
 
 
+
 extension MainViewController {
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return Position.allCases.count
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: "showDetails", sender: self)
     }
@@ -217,18 +252,54 @@ extension MainViewController {
         return employeesByPosition[position]?.count ?? 0
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "EmployeeCell", for: indexPath) as! EmployeeTableViewCell
-        let position = Position.allCases[indexPath.section]
-        if let employees = employeesByPosition[position] {
-            // Sorted by last name
-            let employee = employees.sorted(by: { $0.lname < $1.lname })[indexPath.row]
-            // Prints out last name before first name
-            cell.employeeLabel.text = "\(employee.lname) \(employee.fname)"
+    // Fethcing all the employees to display
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        employeesByPosition = [:]
+        let searchTerms = searchText.split(separator: " ").map { String($0) }
+        for employee in allEmployees {
+            if searchText.isEmpty || searchTerms.allSatisfy({ searchTerm in
+                employee.fname.lowercased().contains(searchTerm.lowercased()) ||
+                employee.lname.lowercased().contains(searchTerm.lowercased()) ||
+                employee.contactDetails.email.lowercased().contains(searchTerm.lowercased()) ||
+                employee.position.rawValue.lowercased().contains(searchTerm.lowercased()) ||
+                (employee.projects?.contains(where: { $0.lowercased().contains(searchTerm.lowercased()) }) ?? false)
+            }) {
+                self.employeesByPosition[employee.position, default: []].append(employee)
+            }
         }
-        return cell
+        employeeTableView.reloadData()
     }
-
+    
+    func configureSearchBar() {
+        searchBar.delegate = self
+        searchBar.text = ""
+        searchBar.backgroundImage = UIImage()
+        searchBar.searchTextField.clearButtonMode = .never
+    }
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        UIView.animate(withDuration: 0.3) {
+            self.cancelButton.isHidden = false
+        }
+    }
+    
+    @objc func refreshData() {
+        fetchEmployees()
+        employeeTableView.refreshControl?.endRefreshing()
+    }
+    
+    func setupRefresh() {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        employeeTableView.refreshControl = refreshControl
+    }
+    
+    // Error shown to user
+    func showError() {
+        let alert = UIAlertController(title: "Error fetching data!", message: "Please try again!", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: .default))
+        present(alert, animated: true)
+    }
 }
 
 

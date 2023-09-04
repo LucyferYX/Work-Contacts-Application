@@ -10,6 +10,7 @@ import UIKit
 class EmployeeTableViewCell: UITableViewCell {
 
     @IBOutlet weak var employeeLabel: UILabel!
+    @IBOutlet weak var contactButton: UIButton!
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -17,6 +18,11 @@ class EmployeeTableViewCell: UITableViewCell {
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
+    }
+    
+    var contactButtonTapped: (() -> Void)?
+    @IBAction func contactButtonTapped(_ sender: UIButton) {
+        contactButtonTapped?()
     }
 
 }
