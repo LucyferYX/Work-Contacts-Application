@@ -43,6 +43,9 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         fetchEmployees()
         //
         fetchAllContacts()
+        
+        let contactStore = CNContactStore()
+        contactStore.requestAccess(for: .contacts) { granted, error in }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -177,22 +180,37 @@ extension MainViewController {
     }
     
     func fetchAllContacts() {
-        // Check if the user has authorized access to the Contacts
-        let authorizationStatus = CNContactStore.authorizationStatus(for: .contacts)
-        guard authorizationStatus == .authorized else {
-            return
-        }
         let contactStore = CNContactStore()
-        let request = CNContactFetchRequest(keysToFetch: [CNContactGivenNameKey as CNKeyDescriptor,
-                                                           CNContactFamilyNameKey as CNKeyDescriptor])
-        do {
-            try contactStore.enumerateContacts(with: request) { contact, stop in
-                self.allContacts.append(contact)
+        
+        switch CNContactStore.authorizationStatus(for: .contacts) {
+        case .authorized:
+            DispatchQueue.global(qos: .userInitiated).async {
+                let keys: [CNKeyDescriptor] = [CNContactGivenNameKey as CNKeyDescriptor,
+                                               CNContactFamilyNameKey as CNKeyDescriptor,
+                                               CNContactViewController.descriptorForRequiredKeys()]
+                let request = CNContactFetchRequest(keysToFetch: keys)
+                
+                do {
+                    try contactStore.enumerateContacts(with: request) { (contact, stop) in
+                        self.allContacts.append(contact)
+                    }
+                } catch {
+                    print("Failed to fetch contact, error: \(error)")
+                }
             }
-        } catch {
-            print("Error fetching contacts: \(error)")
+            
+        case .notDetermined:
+            contactStore.requestAccess(for: .contacts) { (granted, error) in
+                if granted {
+                    self.fetchAllContacts()
+                }
+            }
+            
+        default:
+            print("Not handled")
         }
     }
+
 
 }
 
