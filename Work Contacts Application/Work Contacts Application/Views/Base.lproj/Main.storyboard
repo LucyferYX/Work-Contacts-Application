@@ -22,21 +22,20 @@
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="EmployeeCell" id="BKd-lP-PnB" customClass="EmployeeTableViewCell" customModule="Work_Contacts_Application" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="50" width="375" height="43"/>
+                                        <rect key="frame" x="0.0" y="50" width="375" height="43.666667938232422"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="BKd-lP-PnB" id="XuP-rU-vJI">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666667938232422"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Employee Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xsK-g8-pve">
-                                                    <rect key="frame" x="20" y="11" width="335" height="21"/>
+                                                    <rect key="frame" x="20" y="10.999999999999998" width="335" height="21.333333333333329"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PwP-f6-3fY">
-                                                    <rect key="frame" x="315" y="4" width="60" height="35"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PwP-f6-3fY">
+                                                    <rect key="frame" x="316" y="4.6666666666666679" width="50" height="34.333333333333329"/>
                                                     <color key="tintColor" systemColor="systemYellowColor"/>
                                                     <buttonConfiguration key="configuration" style="plain" image="person.crop.circle" catalog="system"/>
                                                     <connections>
@@ -45,10 +44,12 @@
                                                 </button>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="xsK-g8-pve" firstAttribute="trailing" secondItem="XuP-rU-vJI" secondAttribute="trailingMargin" id="4mn-PM-xxv"/>
-                                                <constraint firstItem="xsK-g8-pve" firstAttribute="leading" secondItem="XuP-rU-vJI" secondAttribute="leadingMargin" id="99P-qF-pDH"/>
-                                                <constraint firstItem="xsK-g8-pve" firstAttribute="top" secondItem="XuP-rU-vJI" secondAttribute="topMargin" id="df8-XB-nhY"/>
-                                                <constraint firstItem="xsK-g8-pve" firstAttribute="centerY" secondItem="XuP-rU-vJI" secondAttribute="centerY" id="kzF-of-Vuz"/>
+                                                <constraint firstItem="xsK-g8-pve" firstAttribute="trailing" secondItem="XuP-rU-vJI" secondAttribute="trailingMargin" id="C3j-W4-hz7"/>
+                                                <constraint firstItem="xsK-g8-pve" firstAttribute="top" secondItem="XuP-rU-vJI" secondAttribute="topMargin" id="TEn-TF-9j9"/>
+                                                <constraint firstItem="xsK-g8-pve" firstAttribute="centerY" secondItem="PwP-f6-3fY" secondAttribute="centerY" id="V2k-Ov-kht"/>
+                                                <constraint firstItem="xsK-g8-pve" firstAttribute="centerY" secondItem="XuP-rU-vJI" secondAttribute="centerY" id="Ysf-fz-oP5"/>
+                                                <constraint firstAttribute="trailing" secondItem="PwP-f6-3fY" secondAttribute="trailing" constant="9" id="dpI-Gh-nZa"/>
+                                                <constraint firstItem="xsK-g8-pve" firstAttribute="leading" secondItem="XuP-rU-vJI" secondAttribute="leadingMargin" id="otf-WU-zRx"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
@@ -145,14 +146,14 @@
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="ProjectCell" id="M3I-48-bkF" customClass="ProjectTableViewCell" customModule="Work_Contacts_Application" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="50" width="375" height="42.666667938232422"/>
+                                        <rect key="frame" x="0.0" y="50" width="375" height="43.333332061767578"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="M3I-48-bkF" id="eh9-8d-Fze">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="42.666667938232422"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.333332061767578"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Project" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wjw-ty-mtE" userLabel="Project Label">
-                                                    <rect key="frame" x="20" y="11.000000000000002" width="335" height="20.666666666666671"/>
+                                                    <rect key="frame" x="20" y="10.999999999999998" width="335" height="21.333333333333329"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
