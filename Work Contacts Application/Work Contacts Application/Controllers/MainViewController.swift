@@ -22,7 +22,6 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     // Dictionary, employees are sorted by position
     var employeesByPosition = [Position: [Employee]]()
     var allEmployees: [Employee] = []
-    //
     var matchingContact: CNContact?
     var allContacts: [CNContact] = []
     
@@ -120,8 +119,6 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
 
 }
 
-
-// Code necessary for handling the native contact requirement!
 
 extension MainViewController {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

@@ -16,6 +16,7 @@
 		7E2524FE2A7F2374003B8E03 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E2524FC2A7F2374003B8E03 /* LaunchScreen.storyboard */; };
 		7E5AC74B2A8880620005A1FD /* EmployeeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5AC74A2A8880620005A1FD /* EmployeeTableViewCell.swift */; };
 		7E8B19662AA2ADE100CDA891 /* ProjectTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E8B19652AA2ADE100CDA891 /* ProjectTableViewCell.swift */; };
+		7EF04DA62ABBBFE6009B254F /* AirbnbSwiftFormatTool in Frameworks */ = {isa = PBXBuildFile; productRef = 7EF04DA52ABBBFE6009B254F /* AirbnbSwiftFormatTool */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +38,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7EF04DA62ABBBFE6009B254F /* AirbnbSwiftFormatTool in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,6 +118,9 @@
 			dependencies = (
 			);
 			name = "Work Contacts Application";
+			packageProductDependencies = (
+				7EF04DA52ABBBFE6009B254F /* AirbnbSwiftFormatTool */,
+			);
 			productName = "Work Contacts Application";
 			productReference = 7E2524EE2A7F2371003B8E03 /* Work Contacts Application.app */;
 			productType = "com.apple.product-type.application";
@@ -144,6 +149,9 @@
 				Base,
 			);
 			mainGroup = 7E2524E52A7F2371003B8E03;
+			packageReferences = (
+				7EF04DA42ABBBFE6009B254F /* XCRemoteSwiftPackageReference "swift" */,
+			);
 			productRefGroup = 7E2524EF2A7F2371003B8E03 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -394,6 +402,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		7EF04DA42ABBBFE6009B254F /* XCRemoteSwiftPackageReference "swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.5;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7EF04DA52ABBBFE6009B254F /* AirbnbSwiftFormatTool */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7EF04DA42ABBBFE6009B254F /* XCRemoteSwiftPackageReference "swift" */;
+			productName = AirbnbSwiftFormatTool;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 7E2524E62A7F2371003B8E03 /* Project object */;
 }
